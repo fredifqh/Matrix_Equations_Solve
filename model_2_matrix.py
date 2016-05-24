@@ -2,19 +2,16 @@
 
 import numpy as np
 import scipy
-import sys
-import matplotlib.pyplot as plt
-
+import argparse
 from scipy import linalg
 from scipy import special
-
-import argparse
 
 parser = argparse.ArgumentParser(description='Short sample app')
 parser.add_argument('-r1', action = 'store', nargs=1, type=float)
 parser.add_argument('-r2', action = 'store', nargs=1, type=float)
 parser.add_argument('-l' , action = 'store', nargs=1, type=int)
 results = parser.parse_args()
+
 ####### constant values #########
 
 r1 = results.r1[0]
@@ -87,29 +84,17 @@ M_0 = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
 for n in np.arange(0, l + 1, 1):
 
-	File1 = open("D_L_L_l_{}.dat".format(n), "w")
-	File2 = open("D_L_N_l_{}.dat".format(n), "w")
-	File3 = open("D_M_M_l_{}.dat".format(n), "w")
-	File4 = open("D_N_L_l_{}.dat".format(n), "w")
-	File5 = open("D_N_N_l_{}.dat".format(n), "w")
+	File1 = open("D_l_{}.dat".format(n), "w")
+	File1.write("f\t\t\tD_L_L\t\t\tD_L_N\t\t\tD_M_M\t\t\tD_N_L\t\t\tD_N_N\n")
 
-	File6  = open("E_L_L_l_{}.dat".format(n), "w")
-	File7  = open("E_L_N_l_{}.dat".format(n), "w")
-	File8  = open("E_M_M_l_{}.dat".format(n), "w")
-	File9  = open("E_N_L_l_{}.dat".format(n), "w")
-	File10 = open("E_N_N_l_{}.dat".format(n), "w")
+	File2 = open("E_l_{}.dat".format(n), "w")
+	File2.write("f\t\t\tE_L_L\t\t\tE_L_N\t\t\tE_M_M\t\t\tE_N_L\t\t\tE_N_N\n")
 
-	File11 = open("F_L_L_l_{}.dat".format(n), "w")
-	File12 = open("F_L_N_l_{}.dat".format(n), "w")
-	File13 = open("F_M_M_l_{}.dat".format(n), "w")
-	File14 = open("F_N_L_l_{}.dat".format(n), "w")
-	File15 = open("F_N_N_l_{}.dat".format(n), "w")
+	File3 = open("F_l_{}.dat".format(n), "w")
+	File3.write("f\t\t\tF_L_L\t\t\tF_L_N\t\t\tF_M_M\t\t\tF_N_L\t\t\tF_N_N\n")
 
-	File16  = open("Z_L_L_l_{}.dat".format(n), "w")
-	File17  = open("Z_L_N_l_{}.dat".format(n), "w")
-	File18  = open("Z_M_M_l_{}.dat".format(n), "w")
-	File19  = open("Z_N_L_l_{}.dat".format(n), "w")
-	File20  = open("Z_N_N_l_{}.dat".format(n), "w")
+	File4 = open("Z_l_{}.dat".format(n), "w")
+	File4.write("f\t\t\tZ_L_L\t\t\tZ_L_N\t\t\tZ_M_M\t\t\tZ_N_L\t\t\tZ_N_N\n")
 
 	File21  = open("CN_{}.dat".format(n), "w")
 	File22  = open("CT_{}.dat".format(n), "w")
@@ -167,52 +152,18 @@ for n in np.arange(0, l + 1, 1):
 ####################################################################################
 		M_S   = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
 		
-		File1.write("{:e}\t\t{:e}\n".format(f, M_S[0, 0]))
-		File2.write("{:e}\t\t{:e}\n".format(f, M_S[0, 2]))
-		File3.write("{:e}\t\t{:e}\n".format(f, M_S[1, 1]))
-		File4.write("{:e}\t\t{:e}\n".format(f, M_S[2, 0]))
-		File5.write("{:e}\t\t{:e}\n".format(f, M_S[2, 2]))
-		File6.write("{:e}\t\t{:e}\n".format(f, M_S[3, 0]))
-		File7.write("{:e}\t\t{:e}\n".format(f, M_S[3, 2]))
-		File8.write("{:e}\t\t{:e}\n".format(f, M_S[4, 1]))	
-		File9.write("{:e}\t\t{:e}\n".format(f, M_S[5, 0]))
-		File10.write("{:e}\t\t{:e}\n".format(f, M_S[5, 2]))
-		File11.write("{:e}\t\t{:e}\n".format(f, M_S[6, 0]))
-		File12.write("{:e}\t\t{:e}\n".format(f, M_S[6, 2]))
-		File13.write("{:e}\t\t{:e}\n".format(f, M_S[7, 1]))
-		File14.write("{:e}\t\t{:e}\n".format(f, M_S[8, 0]))
-		File15.write("{:e}\t\t{:e}\n".format(f, M_S[8, 2]))
-		File16.write("{:e}\t\t{:e}\n".format(f, M_S[9, 0]))
-		File17.write("{:e}\t\t{:e}\n".format(f, M_S[9, 2]))
-		File18.write("{:e}\t\t{:e}\n".format(f, M_S[10, 1]))
-		File19.write("{:e}\t\t{:e}\n".format(f, M_S[11, 0]))
-		File20.write("{:e}\t\t{:e}\n".format(f, M_S[11, 2]))
-		
+		File1.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[0, 0], M_S[0, 2], M_S[1, 1], M_S[2, 0], M_S[2, 2]))
+		File2.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[3, 0], M_S[3, 2], M_S[4, 1], M_S[5, 0], M_S[5, 2]))
+		File3.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[6, 0], M_S[6, 2], M_S[7, 1], M_S[8, 0], M_S[8, 2]))
+		File4.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[9, 0], M_S[9, 2], M_S[10, 1], M_S[11, 0], M_S[11, 2]))
+	
 		CL = M_S[0, 0]**2 + n*(n + 1)*M_S[2, 0]**2
-		File21.write("{:e}\t\t{:e}\n".format(f, CL))
+		File21.write("{:d}\t\t{:e}\n".format(f, CL))
 
 		CT = M_S[1, 1]**2 + n*(n + 1)*M_S[0, 2]**2 + M_S[2, 2] 
-		File22.write("{:e}\t\t{:e}\n".format(f, CT))
+		File22.write("{:d}\t\t{:e}\n".format(f, CT))
 
 File1.close()
 File2.close()
 File3.close()
 File4.close()
-File5.close()
-File6.close()
-File7.close()
-File8.close()
-File9.close()
-File10.close()
-File11.close()
-File12.close()
-File13.close()
-File14.close()
-File15.close()
-File16.close()
-File17.close()
-File18.close()
-File19.close()
-File20.close()
-File21.close()
-File22.close()
