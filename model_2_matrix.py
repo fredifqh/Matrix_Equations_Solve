@@ -79,13 +79,14 @@ def Matrix_D(l, r, x1, x2, mu, lam, f):
 	m_3_3 = (2*mu/r**2)*((l**2 - 1 - 0.5*(x2*r)**2)*f(l, x2*r) + x2*r*f(l + 1, x2*r))
 
 	return np.array([[m_1_1, m_1_2, m_1_3], [m_2_1, m_2_2, m_2_3], [m_3_1, m_3_2, m_3_3]])
+##
 
 M_0 = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
 for n in np.arange(0, l + 1, 1):
-
-	File1 = open("D_l_{}.dat".format(n), "w")
-	File1.write("f\t\t\tD_L_L\t\t\tD_L_N\t\t\tD_M_M\t\t\tD_N_L\t\t\tD_N_N\n")
+#
+	File1 = open("D_l_{}.dat".format(n), "w") 
+	File1.write("#f\t\t\tD_L_L\t\t\tD_L_N\t\t\tD_M_M\t\t\tD_N_L\t\t\tD_N_N\t\t\tK0L\t\t\t\tK0T\n")
 
 	File2 = open("E_l_{}.dat".format(n), "w")
 	File2.write("f\t\t\tE_L_L\t\t\tE_L_N\t\t\tE_M_M\t\t\tE_N_L\t\t\tE_N_N\n")
@@ -95,12 +96,9 @@ for n in np.arange(0, l + 1, 1):
 
 	File4 = open("Z_l_{}.dat".format(n), "w")
 	File4.write("f\t\t\tZ_L_L\t\t\tZ_L_N\t\t\tZ_M_M\t\t\tZ_N_L\t\t\tZ_N_N\n")
-
-	File21  = open("CN_{}.dat".format(n), "w")
-	File22  = open("CT_{}.dat".format(n), "w")
-
+#
 	for f in np.arange(1, 2001, 1):
-
+#
 		coef = 2*np.pi*f
 
 		K0L = coef/C0L
@@ -110,6 +108,7 @@ for n in np.arange(0, l + 1, 1):
 		K1T = coef/C1T
 		K2L = coef/C2L
 		K2T = coef/C2T
+#
 
 ######  Matrix's A elements definition #######
 
@@ -137,31 +136,26 @@ for n in np.arange(0, l + 1, 1):
 		A_4_2 = Matrix_D(n, r1, K2L, K2T, mu_2, lam_2, bessel)
 		A_4_3 = Matrix_D(n, r1, K2L, K2T, mu_2, lam_2, hankel)
 		A_4_4 = Matrix_D(n, r1, K1L, K1T, mu_1, lam_1, bessel)
-
-#############################################################################
-
+####
 		M = np.hstack([A_1_1, -A_1_2, -A_1_3,   M_0 ])
 		N = np.hstack([ M_0 ,  A_2_2,  A_2_3, -A_2_4])
 		P = np.hstack([A_3_1, -A_3_2, -A_3_3,   M_0 ])
 		Q = np.hstack([ M_0 ,  A_4_2,  A_4_3, -A_4_4])
-
 		E = np.vstack([M, N, P, Q])
-
 		F = np.vstack([-B_1_1, M_0, -B_3_1, M_0])
-
-####################################################################################
-		M_S   = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
-		
-		File1.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[0, 0], M_S[0, 2], M_S[1, 1], M_S[2, 0], M_S[2, 2]))
+####
+		M_S = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
+#
+		File1.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[0, 0], M_S[0, 2], M_S[1, 1], M_S[2, 0], M_S[2, 2], K0L, K0T))
 		File2.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[3, 0], M_S[3, 2], M_S[4, 1], M_S[5, 0], M_S[5, 2]))
 		File3.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[6, 0], M_S[6, 2], M_S[7, 1], M_S[8, 0], M_S[8, 2]))
 		File4.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[9, 0], M_S[9, 2], M_S[10, 1], M_S[11, 0], M_S[11, 2]))
-	
-		CL = M_S[0, 0]**2 + n*(n + 1)*M_S[2, 0]**2
-		File21.write("{:d}\t\t{:e}\n".format(f, CL))
+#		
 
-		CT = M_S[1, 1]**2 + n*(n + 1)*M_S[0, 2]**2 + M_S[2, 2] 
-		File22.write("{:d}\t\t{:e}\n".format(f, CT))
+X = np.loadtxt('D_l_0.dat', comments='#', usecols=(1,))
+Y = np.loadtxt('D_l_1.dat', comments='#', usecols=(1,))
+
+print np.concatenate([X, Y])
 
 File1.close()
 File2.close()
