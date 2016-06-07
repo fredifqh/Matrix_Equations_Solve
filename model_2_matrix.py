@@ -135,8 +135,8 @@ for f in np.arange(1, 2000, 1):
 		F = np.vstack([-B_1_1, M_0, -B_3_1, M_0])
 ####
 		M_S = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
-		sigma_L = (4*(2*n + 1)/(K0L*r1)**2)*(M_S[0, 0]**2 + n*(n + 1)*(C0T/C0L)**3*M_S[2, 0])
-		col.append(sigma_L)
+		sigma_L = (4*(2*n + 1)/(K0L*r1)**2)*(M_S[0, 0]**2 + n*(n + 1)*((C0T/C0L)**3)*M_S[2, 0])
+		sigma_T = (2*(2*n + 1)/(K0T*r1)**2)*((1/(n*(n + 1)))*((C0T/C0L)**3)*M_S[0, 2]**2 + M_S[1, 1]**2 + M_S[2, 2])
 	a[:, int(f)] = col
 	M = a.T # transpuesta de la matriz a
 np.savetxt('test.out', M.sum(axis=1), fmt='%.5e', delimiter=' ')
