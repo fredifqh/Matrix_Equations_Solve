@@ -80,25 +80,16 @@ def Matrix_D(l, r, x1, x2, mu, lam, f):
 
 	return np.array([[m_1_1, m_1_2, m_1_3], [m_2_1, m_2_2, m_2_3], [m_3_1, m_3_2, m_3_3]])
 ##
-
 M_0 = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
-for n in np.arange(0, l + 1, 1):
-#
-	File1 = open("D_l_{}.dat".format(n), "w") 
-	File1.write("#f\t\t\tD_L_L\t\t\tD_L_N\t\t\tD_M_M\t\t\tD_N_L\t\t\tD_N_N\t\t\tK0L\t\t\t\tK0T\n")
+a = np.zeros([3, 2000])
 
-	File2 = open("E_l_{}.dat".format(n), "w")
-	File2.write("f\t\t\tE_L_L\t\t\tE_L_N\t\t\tE_M_M\t\t\tE_N_L\t\t\tE_N_N\n")
+for f in np.arange(1, 2000, 1):
 
-	File3 = open("F_l_{}.dat".format(n), "w")
-	File3.write("f\t\t\tF_L_L\t\t\tF_L_N\t\t\tF_M_M\t\t\tF_N_L\t\t\tF_N_N\n")
+	col = []
+	
+	for n in np.arange(0, l + 1, 1):
 
-	File4 = open("Z_l_{}.dat".format(n), "w")
-	File4.write("f\t\t\tZ_L_L\t\t\tZ_L_N\t\t\tZ_M_M\t\t\tZ_N_L\t\t\tZ_N_N\n")
-#
-	for f in np.arange(1, 2001, 1):
-#
 		coef = 2*np.pi*f
 
 		K0L = coef/C0L
@@ -108,7 +99,6 @@ for n in np.arange(0, l + 1, 1):
 		K1T = coef/C1T
 		K2L = coef/C2L
 		K2T = coef/C2T
-#
 
 ######  Matrix's A elements definition #######
 
@@ -145,19 +135,8 @@ for n in np.arange(0, l + 1, 1):
 		F = np.vstack([-B_1_1, M_0, -B_3_1, M_0])
 ####
 		M_S = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
-#
-		File1.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[0, 0], M_S[0, 2], M_S[1, 1], M_S[2, 0], M_S[2, 2], K0L, K0T))
-		File2.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[3, 0], M_S[3, 2], M_S[4, 1], M_S[5, 0], M_S[5, 2]))
-		File3.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[6, 0], M_S[6, 2], M_S[7, 1], M_S[8, 0], M_S[8, 2]))
-		File4.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[9, 0], M_S[9, 2], M_S[10, 1], M_S[11, 0], M_S[11, 2]))
-#		
-
-X = np.loadtxt('D_l_0.dat', comments='#', usecols=(1,))
-Y = np.loadtxt('D_l_1.dat', comments='#', usecols=(1,))
-
-print np.concatenate([X, Y])
-
-File1.close()
-File2.close()
-File3.close()
-File4.close()
+		sigma_L = (4*(2*n + 1)/(K0L*r1)**2)*(M_S[0, 0]**2 + n*(n + 1)*(C0T/C0L)**3*M_S[2, 0])
+		col.append(sigma_L)
+	a[:, int(f)] = col
+	M = a.T # transpuesta de la matriz a
+np.savetxt('test.out', M.sum(axis=1), fmt='%.5e', delimiter=' ')
