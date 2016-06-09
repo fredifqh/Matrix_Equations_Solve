@@ -5,6 +5,7 @@ import scipy
 import argparse
 from scipy import linalg
 from scipy import special
+np.set_printoptions(threshold=np.nan)
 
 parser = argparse.ArgumentParser(description='Short sample app')
 parser.add_argument('-r1', action = 'store', nargs=1, type=float)
@@ -82,11 +83,11 @@ def Matrix_D(l, r, x1, x2, mu, lam, f):
 ##
 M_0 = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
-a = np.zeros([16, 2000]) # Matrices de 2000 filas por 16 columnas inicializadas con elementos cero
-b = np.zeros([16, 2000])
-
-for f in np.arange(1, 2000, 1):
-
+a = np.zeros([16, 2001]) # Matrices de 2000 filas por 16 columnas inicializadas con elementos cero
+b = np.zeros([16, 2001])
+	
+for f in np.arange(1, 2001, 1):
+	#print f
 	ColSig_L = [] # Lista de elementos vacio que contendra los valores de sigma
 	ColSig_T = []
 	
@@ -143,14 +144,18 @@ for f in np.arange(1, 2000, 1):
 		n = n + 1
 		sigma_T = (2*(2*n + 1)/(K0T*r2)**2)*((1/(n*(n + 1)))*((C0T/C0L)**3)*M_S[0, 2]**2 + M_S[1, 1]**2 + M_S[2, 2])
 
+		#print sigma_L
+		
 		ColSig_L.append(sigma_L)
 		ColSig_T.append(sigma_T)
 	
-	a[:, int(f)] = ColSig_L
-	b[:, int(f)] = ColSig_T
+	#print ColSig_L
+	
+	a[:, f] = ColSig_L
+	b[:, f] = ColSig_T
 
-	MatSigmaL = a.T # transpuesta de la matriz a
-	MatSigmaT = b.T
+	MatSigmaL = a
+	MatSigmaT = b
 
-np.savetxt('sigma_L.dat', MatSigmaL.sum(axis=1), fmt='%.5e', delimiter=' ')
-np.savetxt('sigma_T.dat', MatSigmaT.sum(axis=1), fmt='%.5e', delimiter=' ')
+np.savetxt('sigma_L.dat', MatSigmaL.sum(axis=0), fmt='%.5e', delimiter=' ')
+np.savetxt('sigma_T.dat', MatSigmaT.sum(axis=0), fmt='%.5e', delimiter=' ')
