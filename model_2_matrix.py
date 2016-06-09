@@ -80,18 +80,33 @@ def Matrix_D(l, r, x1, x2, mu, lam, f):
 	m_3_3 = (2*mu/r**2)*((l**2 - 1 - 0.5*(x2*r)**2)*f(l, x2*r) + x2*r*f(l + 1, x2*r))
 
 	return np.array([[m_1_1, m_1_2, m_1_3], [m_2_1, m_2_2, m_2_3], [m_3_1, m_3_2, m_3_3]])
-##
+
 M_0 = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
-a = np.zeros([16, 2001]) # Matrices de 2000 filas por 16 columnas inicializadas con elementos cero
-b = np.zeros([16, 2001])
-	
-for f in np.arange(1, 2001, 1):
-	#print f
-	ColSig_L = [] # Lista de elementos vacio que contendra los valores de sigma
-	ColSig_T = []
-	
-	for n in np.arange(0, l + 1, 1):
+a = np.zeros([2000, 16])
+b = np.zeros([2000, 15])
+
+for n in np.arange(0, l + 1, 1):
+
+	File1 = open("D_l_{}.dat".format(n), "w")
+	#File1.write("f\t\t\tD_L_L\t\t\tD_L_N\t\t\tD_M_M\t\t\tD_N_L\t\t\tD_N_N\n")
+
+	File2 = open("E_l_{}.dat".format(n), "w")
+	#File2.write("f\t\t\tE_L_L\t\t\tE_L_N\t\t\tE_M_M\t\t\tE_N_L\t\t\tE_N_N\n")
+
+	File3 = open("F_l_{}.dat".format(n), "w")
+	#File3.write("f\t\t\tF_L_L\t\t\tF_L_N\t\t\tF_M_M\t\t\tF_N_L\t\t\tF_N_N\n")
+
+	File4 = open("Z_l_{}.dat".format(n), "w")
+	#File4.write("f\t\t\tZ_L_L\t\t\tZ_L_N\t\t\tZ_M_M\t\t\tZ_N_L\t\t\tZ_N_N\n")
+
+	File21  = open("CN_{}.dat".format(n), "w")
+	#File22  = open("CT_{}.dat".format(n), "w")
+
+	col_L = []
+	col_T = []
+
+	for f in np.arange(1, 2001, 1):
 
 		coef = 2*np.pi*f
 
@@ -129,33 +144,40 @@ for f in np.arange(1, 2001, 1):
 		A_4_2 = Matrix_D(n, r1, K2L, K2T, mu_2, lam_2, bessel)
 		A_4_3 = Matrix_D(n, r1, K2L, K2T, mu_2, lam_2, hankel)
 		A_4_4 = Matrix_D(n, r1, K1L, K1T, mu_1, lam_1, bessel)
-####
+
+#############################################################################
+
 		M = np.hstack([A_1_1, -A_1_2, -A_1_3,   M_0 ])
 		N = np.hstack([ M_0 ,  A_2_2,  A_2_3, -A_2_4])
 		P = np.hstack([A_3_1, -A_3_2, -A_3_3,   M_0 ])
 		Q = np.hstack([ M_0 ,  A_4_2,  A_4_3, -A_4_4])
+
 		E = np.vstack([M, N, P, Q])
+
 		F = np.vstack([-B_1_1, M_0, -B_3_1, M_0])
-####
-		M_S = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
+
+####################################################################################
+		M_S   = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
+		
+		File1.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[0, 0], M_S[0, 2], M_S[1, 1], M_S[2, 0], M_S[2, 2]))
+		File2.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[3, 0], M_S[3, 2], M_S[4, 1], M_S[5, 0], M_S[5, 2]))
+		File3.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[6, 0], M_S[6, 2], M_S[7, 1], M_S[8, 0], M_S[8, 2]))
+		File4.write("{:04d}\t{:e}\t{:e}\t{:e}\t{:e}\t{:e}\n".format(f, M_S[9, 0], M_S[9, 2], M_S[10, 1], M_S[11, 0], M_S[11, 2]))
 
 		sigma_L = (4*(2*n + 1)/(K0L*r2)**2)*(M_S[0, 0]**2 + n*(n + 1)*((C0T/C0L)**3)*M_S[2, 0])
-		
-		n = n + 1
+	
 		sigma_T = (2*(2*n + 1)/(K0T*r2)**2)*((1/(n*(n + 1)))*((C0T/C0L)**3)*M_S[0, 2]**2 + M_S[1, 1]**2 + M_S[2, 2])
 
-		#print sigma_L
-		
-		ColSig_L.append(sigma_L)
-		ColSig_T.append(sigma_T)
+		col_L.append(sigma_L)
+		col_T.append(sigma_T)
 	
-	#print ColSig_L
-	
-	a[:, f] = ColSig_L
-	b[:, f] = ColSig_T
+	b[:, n] = col_T
+	a[:, n] = col_L
 
-	MatSigmaL = a
-	MatSigmaT = b
+np.savetxt('sigmaL.dat', a.sum(axis=1), fmt='%.5e', delimiter=' ')
+np.savetxt('sigmaT.dat', b.sum(axis=1), fmt='%.5e', delimiter=' ')
 
-np.savetxt('sigma_L.dat', MatSigmaL.sum(axis=0), fmt='%.5e', delimiter=' ')
-np.savetxt('sigma_T.dat', MatSigmaT.sum(axis=0), fmt='%.5e', delimiter=' ')
+File1.close()
+File2.close()
+File3.close()
+File4.close()
