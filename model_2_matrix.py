@@ -82,11 +82,13 @@ def Matrix_D(l, r, x1, x2, mu, lam, f):
 ##
 M_0 = np.array([[0, 0, 0], [0, 0, 0], [0, 0, 0]])
 
-a = np.zeros([3, 2000])
+a = np.zeros([16, 2000]) # Matrices de 2000 filas por 16 columnas inicializadas con elementos cero
+b = np.zeros([16, 2000])
 
 for f in np.arange(1, 2000, 1):
 
-	col = []
+	ColSig_L = [] # Lista de elementos vacio que contendra los valores de sigma
+	ColSig_T = []
 	
 	for n in np.arange(0, l + 1, 1):
 
@@ -135,8 +137,20 @@ for f in np.arange(1, 2000, 1):
 		F = np.vstack([-B_1_1, M_0, -B_3_1, M_0])
 ####
 		M_S = np.absolute(scipy.linalg.solve(E, F)) # Matrix Solution
-		sigma_L = (4*(2*n + 1)/(K0L*r1)**2)*(M_S[0, 0]**2 + n*(n + 1)*((C0T/C0L)**3)*M_S[2, 0])
-		sigma_T = (2*(2*n + 1)/(K0T*r1)**2)*((1/(n*(n + 1)))*((C0T/C0L)**3)*M_S[0, 2]**2 + M_S[1, 1]**2 + M_S[2, 2])
-	a[:, int(f)] = col
-	M = a.T # transpuesta de la matriz a
-np.savetxt('test.out', M.sum(axis=1), fmt='%.5e', delimiter=' ')
+
+		sigma_L = (4*(2*n + 1)/(K0L*r2)**2)*(M_S[0, 0]**2 + n*(n + 1)*((C0T/C0L)**3)*M_S[2, 0])
+		
+		n = n + 1
+		sigma_T = (2*(2*n + 1)/(K0T*r2)**2)*((1/(n*(n + 1)))*((C0T/C0L)**3)*M_S[0, 2]**2 + M_S[1, 1]**2 + M_S[2, 2])
+
+		ColSig_L.append(sigma_L)
+		ColSig_T.append(sigma_T)
+	
+	a[:, int(f)] = ColSig_L
+	b[:, int(f)] = ColSig_T
+
+	MatSigmaL = a.T # transpuesta de la matriz a
+	MatSigmaT = b.T
+
+np.savetxt('sigma_L.dat', MatSigmaL.sum(axis=1), fmt='%.5e', delimiter=' ')
+np.savetxt('sigma_T.dat', MatSigmaT.sum(axis=1), fmt='%.5e', delimiter=' ')
